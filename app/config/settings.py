@@ -13,6 +13,6 @@ MAIL_CONFIG = {
 }
 
 TOKEN_CONFIG = {
-    "SECRET_KEY": config("SECRET_KEY", cat=str),
-    "ALGORITHM": config("ALGORITHM", cat=str),
+    "SECRET_KEY": config("SECRET_KEY", cast=str),
+    "ALGORITHM": config("ALGORITHM", cast=str),
 }
