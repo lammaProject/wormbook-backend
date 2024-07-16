@@ -3,10 +3,14 @@ from fastapi import APIRouter, BackgroundTasks, Response
 from app.schemas.auth import EmailSchema, VerifyCode
 from app.services.auth import send_verification_code_email, create_access_token
 
-router = APIRouter(prefix="/auth")
+router = APIRouter()
 
 
-@router.post("/request-verification-code")
+@router.post(
+    "/request-verification-code",
+    summary="Отправка кода на почту",
+    description="Какой то",
+)
 async def request_verification_code(
     background_tasks: BackgroundTasks, email: EmailSchema
 ):

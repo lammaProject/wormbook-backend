@@ -1,4 +1,8 @@
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel, EmailStr, constr
+
+
+bearer_scheme = HTTPBearer()
 
 
 class EmailSchema(BaseModel):

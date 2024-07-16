@@ -16,3 +16,5 @@ TOKEN_CONFIG = {
     "SECRET_KEY": config("SECRET_KEY", cast=str),
     "ALGORITHM": config("ALGORITHM", cast=str),
 }
+
+UPLOAD_CONFIG = {"BOOKS_COVER": config("BOOKS_COVER", cast=str)}
