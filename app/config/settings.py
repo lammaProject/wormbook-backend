@@ -18,3 +18,5 @@ TOKEN_CONFIG = {
 }
 
 UPLOAD_CONFIG = {"BOOKS_COVER": config("BOOKS_COVER", cast=str)}
+
+origins = ["http://localhost:3000", "http://127.0.0.1:3000"]

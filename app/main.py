@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 
+from app.config.settings import origins
 from app.middleware import add_process_token
 from app.routes import auth, profile, books
 from app.services.auth import verify_token
@@ -12,6 +14,14 @@ app = FastAPI(
 )
 
 Base.metadata.create_all(bind=engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.middleware("http")

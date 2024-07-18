@@ -28,6 +28,8 @@ async def verify_code_route(verify: VerifyCode, response: Response):
             httponly=True,
             max_age=1800,
             expires=1800,
+            secure=False,
+            path="/",
         )
 
     return result
