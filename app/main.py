@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.settings import origins
 from app.middleware import add_process_token
-from app.routes import auth, profile, books
+from app.routes import auth, profile, books, admin
 from app.services.auth import verify_token
 from app.config.database import Base, engine
 
@@ -34,6 +34,12 @@ app.include_router(
     profile.router,
     tags=["Профиль"],
     prefix="/profile",
+    dependencies=[Depends(verify_token)],
+)
+app.include_router(
+    admin.router,
+    tags=["Админка"],
+    prefix="/admin",
     dependencies=[Depends(verify_token)],
 )
 app.include_router(books.router, tags=["Книги"], prefix="/books")
