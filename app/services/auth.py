@@ -4,23 +4,26 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 import jwt
-from fastapi import BackgroundTasks, Depends, HTTPException, status, Request
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import BackgroundTasks, Request
 from fastapi_mail import MessageSchema, FastMail, ConnectionConfig
 
 from app.config.settings import TOKEN_CONFIG, MAIL_CONFIG
-from app.schemas.auth import EmailSchema, VerifyCode, bearer_scheme
+from app.schemas.auth import EmailSchema, VerifyCode
 
 verification_codes: Dict[str, str] = {}
 
 
-def generate_verification_code():
-    characters = string.digits
-    code = "".join(random.choice(characters) for _ in range(6))
-    return code
-
-
 async def create_access_token(verify: VerifyCode, expires_delta: timedelta = None):
+    """
+    Создает JWT токен доступа после проверки кода подтверждения.
+
+    Args:
+        verify (VerifyCode): Объект с email и кодом подтверждения.
+        expires_delta (timedelta, optional): Время жизни токена. По умолчанию None.
+
+    Returns:
+        dict: Объект с токеном доступа или сообщением об ошибке.
+    """
     stored_code = verification_codes.get(verify.email)
 
     if stored_code is None or verify.code != stored_code:
@@ -43,7 +46,15 @@ async def create_access_token(verify: VerifyCode, expires_delta: timedelta = Non
 async def send_verification_code_email(
     background_tasks: BackgroundTasks, email: EmailSchema
 ):
-    code = generate_verification_code()
+    """
+    Отправляет код подтверждения на указанный email.
+
+    Args:
+        background_tasks (BackgroundTasks): Объект для выполнения задач в фоновом режиме.
+        email (EmailSchema): Объект с email адресом получателя.
+    """
+    characters = string.digits
+    code = "".join(random.choice(characters) for _ in range(6))
     verification_codes[email.email] = code
     message = MessageSchema(
         subject="Код подтверждения",
@@ -56,30 +67,16 @@ async def send_verification_code_email(
     background_tasks.add_task(fm.send_message, message)
 
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-    token = credentials.credentials
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Не авторизованы",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        if token.startswith("Bearer "):
-            token = token[len("Bearer ")]
-        payload = jwt.decode(
-            token,
-            TOKEN_CONFIG["SECRET_KEY"],
-            algorithms=[TOKEN_CONFIG["ALGORITHM"]],
-        )
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except Exception:
-        raise credentials_exception
-    return username
-
-
 def get_username_from_token(request: Request):
+    """
+    Извлекает имя пользователя (email) из JWT токена в куки запроса.
+
+    Args:
+        request (Request): Объект запроса FastAPI.
+
+    Returns:
+        str: Имя пользователя (email) из токена.
+    """
     token = request.cookies.get("access_token")
     payload = jwt.decode(
         token, TOKEN_CONFIG["SECRET_KEY"], algorithms=[TOKEN_CONFIG["ALGORITHM"]]

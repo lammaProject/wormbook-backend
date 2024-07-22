@@ -12,3 +12,11 @@ class EmailSchema(BaseModel):
 class VerifyCode(BaseModel):
     email: EmailStr
     code: constr(min_length=6, max_length=6, strict=True)
+
+
+class VerifyToken(BaseModel):
+    access_token: str
+
+
+class MessageResponse(BaseModel):
+    message: str

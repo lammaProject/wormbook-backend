@@ -11,7 +11,7 @@ def get_user_by_username(db: Session, username: str):
 
 
 def create_user(db: Session, username: str):
-    db_user = Profile(username=username)
+    db_user = Profile(username=username, role="user")
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

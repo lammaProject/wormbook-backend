@@ -12,6 +12,11 @@ async def get_book_db(book: BookGet):
         )
 
 
+async def get_books_db():
+    with SessionLocal() as db:
+        return db.query(Book).all()
+
+
 async def create_book_db(book: BookCreate):
     with SessionLocal() as db:
         db_book = Book(
