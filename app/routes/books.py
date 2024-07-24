@@ -33,7 +33,6 @@ async def get_books(books: list[Book] = Depends(get_books)):
     summary="Получить информацию о книге",
     description="Возвращает детальную информацию о конкретной книге.",
     response_description="Возвращает детальную информацию о конкретной книге.",
-    response_model=Book,
 )
 async def get_book(book: Book = Depends(get_book)):
     """

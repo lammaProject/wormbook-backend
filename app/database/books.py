@@ -1,15 +1,13 @@
+from typing import Optional
+
 from app.config.database import SessionLocal
 from app.schemas.books import BookCreate, BookGet
 from app.models.books import Book
 
 
-async def get_book_db(book: BookGet):
+async def get_book_db(book_id: Optional[int] = None):
     with SessionLocal() as db:
-        return (
-            db.query(Book)
-            .filter(Book.title == book.title, Book.author == book.author)
-            .first()
-        )
+        return db.query(Book).filter(Book.id == book_id).first()
 
 
 async def get_books_db():

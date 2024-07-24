@@ -39,7 +39,6 @@ async def request_verification_code(
     summary="Проверка кода подтверждения",
     description="Проверяет код подтверждения и, в случае успеха, создает и устанавливает токен доступа.",
     response_description="Токен доступа",
-    response_model=VerifyToken,
 )
 async def verify_code_route(verify: VerifyCode, response: Response):
     """

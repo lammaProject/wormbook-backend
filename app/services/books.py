@@ -1,24 +1,18 @@
 import os
 import shutil
+from typing import Optional
 
 from fastapi import UploadFile, File, Form
 
 from app.config.settings import UPLOAD_CONFIG
 from app.database.books import create_book_db, get_book_db, get_books_db
-from app.schemas.books import BookCreate, BookGet
+from app.schemas.books import BookCreate
 
 
-async def get_book(book: BookGet):
-    """
-    Получает информацию о конкретной книге.
-
-    Args:
-        book (BookGet): Объект с данными для поиска книги.
-
-    Returns:
-        dict: Информация о запрошенной книге.
-    """
-    return await get_book_db(book)
+async def get_book(book_id: Optional[int] = None):
+    if book_id is None:
+        return None
+    return await get_book_db(book_id)
 
 
 async def get_books():

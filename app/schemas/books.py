@@ -15,5 +15,4 @@ class Book(BaseModel):
 
 
 class BookGet(BaseModel):
-    title: str
-    author: str
+    id: str
