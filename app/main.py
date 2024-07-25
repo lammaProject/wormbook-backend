@@ -19,7 +19,7 @@ app.mount(
     name="upload",
 )
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine, checkfirst=True)
 
 app.add_middleware(
     CORSMiddleware,

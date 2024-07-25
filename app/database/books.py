@@ -17,9 +17,7 @@ async def get_books_db():
 
 async def create_book_db(book: BookCreate):
     with SessionLocal() as db:
-        db_book = Book(
-            title=book.title, author=book.author, cover_image=book.cover_image
-        )
+        db_book = Book(**book.dict())
         db.add(db_book)
         db.commit()
         db.refresh(db_book)
