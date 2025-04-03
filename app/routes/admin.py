@@ -26,4 +26,4 @@ async def upload_file(book: Book = Depends(create_book)):
     Returns:
     - dict: Словарь, содержащий путь к сохраненному изображению обложки и информацию о книге
     """
-    return {"book": book}
+    return {"book": "test"}

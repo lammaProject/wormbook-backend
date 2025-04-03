@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 import jwt
-from fastapi import BackgroundTasks, Request
+from fastapi import Request
 from fastapi_mail import MessageSchema, FastMail, ConnectionConfig
+from starlette.responses import JSONResponse
 
 from app.config.settings import TOKEN_CONFIG, MAIL_CONFIG
 from app.schemas.auth import EmailSchema, VerifyCode
@@ -43,28 +44,52 @@ async def create_access_token(verify: VerifyCode, expires_delta: timedelta = Non
     return {"access_token": encoded_jwt}
 
 
-async def send_verification_code_email(
-    background_tasks: BackgroundTasks, email: EmailSchema
-):
-    """
-    Отправляет код подтверждения на указанный email.
+async def send_verification_code_email(email: EmailSchema):
+    try:
+        characters = string.digits
+        code = "".join(random.choice(characters) for _ in range(6))
+        verification_codes[email.email] = code
 
-    Args:
-        background_tasks (BackgroundTasks): Объект для выполнения задач в фоновом режиме.
-        email (EmailSchema): Объект с email адресом получателя.
-    """
-    characters = string.digits
-    code = "".join(random.choice(characters) for _ in range(6))
-    verification_codes[email.email] = code
-    message = MessageSchema(
-        subject="Код подтверждения",
-        recipients=[email.email],
-        body=f"Ваш код подтверждения: {code}",
-        subtype="plain",
-    )
+        # Создаем более информативное сообщение
+        body_content = f"""
+        Здравствуйте!
 
-    fm = FastMail(ConnectionConfig(**MAIL_CONFIG))
-    background_tasks.add_task(fm.send_message, message)
+        Ваш код подтверждения: {code}
+
+        С уважением,
+        Команда вашего сервиса
+        """
+
+        message = MessageSchema(
+            subject="Код подтверждения для вашего аккаунта",
+            recipients=[email.email],
+            body=body_content,
+            subtype="plain",
+            headers={
+                "X-Priority": "1",
+                "Importance": "high",
+                "X-MSMail-Priority": "High",
+            },
+        )
+
+        fm = FastMail(ConnectionConfig(**MAIL_CONFIG))
+
+        print(f"Attempting to send email to {email.email} with code {code}")
+        print(f"SMTP settings: {MAIL_CONFIG['MAIL_SERVER']}:{MAIL_CONFIG['MAIL_PORT']}")
+
+        await fm.send_message(message)
+
+        print(f"Email sent successfully to {email.email}")
+        return JSONResponse(status_code=200, content={"message": "email has been sent"})
+    except Exception as e:
+        print(f"Error sending email to {email.email}: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        import traceback
+
+        print(traceback.format_exc())
+        return JSONResponse(
+            status_code=500, content={"message": f"Failed to send email: {str(e)}"}
+        )
 
 
 def get_username_from_token(request: Request):

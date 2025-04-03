@@ -1,5 +1,6 @@
 import enum
 from pydantic import BaseModel
+from fastapi import UploadFile, File
 
 
 class CategoryEnum(enum.Enum):
@@ -23,9 +24,9 @@ class Book(BaseModel):
     id: int
     title: str
     author: str
-    front_file: str
-    back_file: str
-    bot_file: str
+    front_file: UploadFile = File(...)
+    back_file: UploadFile = File(...)
+    bot_file: UploadFile = File(...)
     rating: float
     category: CategoryEnum
 

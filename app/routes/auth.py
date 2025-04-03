@@ -15,9 +15,7 @@ router = APIRouter()
     response_description="Ответ что все создано",
     response_model=MessageResponse,
 )
-async def request_verification_code(
-    background_tasks: BackgroundTasks, email: EmailSchema
-):
+async def request_verification_code(email: EmailSchema):
     """
     Отправляет код подтверждения на указанный email адрес.
 
@@ -30,8 +28,7 @@ async def request_verification_code(
     Returns:
     - dict: Сообщение о успешной отправке кода
     """
-    await send_verification_code_email(background_tasks, email)
-    return {"message": "Код подтверждения отправлен на вашу электронную почту"}
+    return await send_verification_code_email(email)
 
 
 @router.post(
